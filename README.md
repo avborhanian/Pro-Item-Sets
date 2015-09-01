@@ -49,3 +49,5 @@ Once you've done this, you can now initialize the database.
 		from lolitemsets import init_db
 		init_db()
 Once you initialize the database, you will have champions and items in it, but no matches. You'll have to call add_matches as described above.
+
+Remember guys, Pro-Item-Sets isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
