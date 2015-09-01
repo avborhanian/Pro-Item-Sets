@@ -1,0 +1,62 @@
+body {
+    background-color: #303030 ;
+    font-family: 'Oswald', sans-serif;
+    color: #FFFFFF ;
+    padding-top: 70px;
+    font-size: 150%;
+}
+.item_set {
+    display:inline-block;
+    
+}
+
+.item_info {
+    position: relative;
+    display:inline-block;
+}
+.count {
+    position: absolute;
+    left: 30px;
+    top: 25px;
+    color: white;
+}
+
+.modal {
+    max-width: 900px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.modal-header {
+    background-color: #303030 ;
+}
+.modal-body {
+    background-color: #303030 ;
+}
+.modal-footer {
+    background-color: #303030 ;
+}
+.matches {
+    padding: 0px;
+}
+
+.series {
+    max-width: 900px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.match {
+    background-color: #F0F0F0 ;
+}
+
+.champions {
+    width: 90%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.champions > img {
+    width: 9.4%;
+    position: relative;
+}
