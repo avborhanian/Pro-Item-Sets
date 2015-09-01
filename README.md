@@ -38,9 +38,7 @@ Once you've done this, you can now initialize the database.
 1. If you're just adding more matches, all you need to do is run python in command prompt. Once you do so, write the following commands:
     
 		from lolitemsets import add_matches
-	    add_matches("YYYY-MM-DD")
-
-	Where YYYY-MM-DD is some date. This will get a week of games starting from that date. 
+	    add_match()
 
     >Note: This is super bad and mean to Riot's database, don't do this.
 
