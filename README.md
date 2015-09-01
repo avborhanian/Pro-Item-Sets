@@ -1,7 +1,10 @@
 LOL-ItemSets
 ===================
 
-This program acts as a webapp, which will display two weeks of games from NA, EU, KR, and the IWC. Users can then select a particular game they're interested in, and select a player to download that particular item build.
+This program acts as a webapp, which will display the past 5 weeks of games from a few Pro League of Legends regions. Users can then select a particular game they're interested in, and select a player to download that particular item build.
+
+If you're just interested in seeing what it looks like, check out this youtube video to get a demonstration (I recommend muting):
+http://youtu.be/ze_MWHqlPeI
 
 ----------
 
