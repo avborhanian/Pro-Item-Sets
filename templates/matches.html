@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+
+  <ul class=matches>
+  {% set started = false %}
+  {% set title = "" %}
+  {% for match in matches %}
+    {% if started == false %}
+        <div class="series">
+    {% endif %}
+            {% set new_title = match['teams'][0] + " vs " + match['teams'][1] %}
+            {% if new_title != title %}
+                <h1>{{ new_title }}</h1>
+                {% set title = new_title %}
+            {% endif %}
+            <div class="match">
+                <a href="/match/{{ match['match_id'] }}">
+                <h3>Game {{ match['game_number'] }}</h3>
+                <div class="champions">
+                    {% for champ in match['champions'] %}
+                        <img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ champ }}">
+                    {% endfor %}
+                </div>
+                </a>
+            </div>
+  {% else %}
+    <li><em>Dang. We haven't made matches for these pages yet. Might be because we didn't cover that week, might be because Riot doesn't have match history pages available. Either way, we messed up. Sorry dude.</em></li>
+  {% endfor %}
+  </ul>
+{% endblock %}
