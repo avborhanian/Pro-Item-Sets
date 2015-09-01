@@ -10,6 +10,7 @@ How To Run
 -------------
 
 This program requires two things to run:
+
 1. The 2.7 branch of Python
 2. Flask, the microframework server for Python.
 
