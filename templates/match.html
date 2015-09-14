@@ -2,12 +2,12 @@
     
 {% block body %}
 <script>
-    var item_sets = {{ match.item_sets|safe }};
-    var participantIds = {{ match.jparticipants|safe }};
-    var champions = {{ match.jchampions|safe }};
+    var item_sets = { {% for m in match %}{{m['participant_id']}}:{{ m['safe_set'] | safe }},{% endfor %} };
+    var participantIds = [ {% for m in match %}"{{ m['name'] }}",{% endfor %} ];
+    var champions = [ {% for m in match %}"{{ m['img_url'] }}",{% endfor %} ];
 </script>
 <script type="text/javascript">
-var item_url = "http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/"
+var item_url = "{{ version.cdn }}/{{ version.dd }}/img/item/"
 function item_img(item_code) {
     return "<img src=" + item_url + item_code + ".png height=\"42\" width=\"42\"/>";
 }
@@ -33,33 +33,17 @@ $(document).ready(function(){
             string += "</div><p>";
         }
         $("#orderDetails").html(string);
-        file_title = (champions[data_id - 1].substr(0, champions[data_id - 1].length - 4) + "_" + participantIds[data_id - 1]['player']['summonerName']).split(' ').join('_');
-        item_sets[data_id]['title'] = participantIds[data_id - 1]['player']['summonerName'] + "'s " + champions[data_id - 1].substr(0, champions[data_id - 1].length - 4)
+        file_title = (champions[data_id - 1].substr(0, champions[data_id - 1].length - 4) + "_" + participantIds[data_id - 1]).split(' ').join('_');
+        item_sets[data_id]['title'] = participantIds[data_id - 1] + "'s " + champions[data_id - 1].substr(0, champions[data_id - 1].length - 4)
         var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(item_sets[data_id]));
         $("#downloadButton").html('<a href="data:' + data + '" download=' + file_title + '.json style="color: white">Download Item Set</a>');
     });
 });
 </script>
-<style>
-.item_set {
-    display:inline-block;
-    
-}
-
-.item_info {
-    position: relative;
-    display:inline-block;
-}
-.count {
-    position: absolute;
-    left: 30px;
-    top: 25px;
-    color: white;
-}
-</style>
-
+    <div class="match">
     {% for i in range(0, 2) %}
     <div class="col-xs-6">
+        <h1>{{ match[i * 5]['team_name'] }}</h1>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead>
@@ -73,24 +57,28 @@ $(document).ready(function(){
                 </thead>
                 <tbody>
                         {% for j in range(5 * i, 5 * i + 5) %}
+                        {% set p = match[j] %}
                         <tr data-toggle="modal" data-id="{{ j + 1}}" data-target="#orderModal">
                             <td class="col-md-1">
-                                <img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][j] }}" width="100%">
+                                <img src="{{ version.cdn }}/{{ version.dd }}/img/champion/{{ p['img_url'] }}" width="100%">
                             </td>
                             <td class="col-md-2">
                                     {% for k in range (1, 3) %}
-                                    <img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/spell/{{ summoners[match['participants'][j]['spell' + k|string + 'Id']] }}" width="50%" style="max-width: 50px;"></img>
+                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/spell/{{ p['spell' + k|string ] }}" width="50%" style="max-width: 50px;"></img>
                                     {% endfor %}
                             </td>
-                            <td class="col-md-2">{{ match['participantIds'][j]['player']['summonerName'] }}</td>
-                            {% set stats = match['participants'][j]['stats'] %}
-                            <td class="col-md-1">{{ stats['kills'] }}/{{ stats['deaths'] }}/{{ stats['assists'] }}</td>
-                            <td class="col-md-4">
-                                {% for item_num in range(0, 7) %}
-                                    {% if match['participants'][j]['stats']['item' + item_num|string] > 0 %}
-                                        <img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/{{ match['participants'][j]['stats']['item' + item_num|string] }}.png" width="20%" style="max-width: 42px;"> 
-                                    {% endif %}
+                            <td class="col-md-2">{{ p['name'] }}</td>
+                            <td class="col-md-1">{{ p['kills'] }}/{{ p['deaths'] }}/{{ p['assists'] }}</td>
+                            <td class="items_column">
+                                {% set item_block = p['item_set']['blocks'][p['item_set']['blocks']|length - 1]['items'] %}
+                                <div class="items_list">
+                                {% for k in item_block %}
+                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/item/{{ k['id'] }}.png" width="33%" style="max-width: 42px;"> 
                                 {% endfor %}
+                                {% for i in range(item_block|length, 7) %}
+                                    <div style="width:20%; background-color:blue"></div>
+                                {% endfor %}
+                               </div>
                             </td>
                         </tr>
                         {% endfor %}                    
@@ -99,6 +87,7 @@ $(document).ready(function(){
         </div>
     </div>
     {% endfor %}
+</div>
    <!-- The modal Popup -->
 <div id="orderModal" class="modal fade" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
     <div class="modal-content">
