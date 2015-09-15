@@ -5,13 +5,8 @@ This program acts as a webapp, which will display the past 5 weeks of games from
 
 If you're just interested in seeing what it looks like, check out this youtube video to get a demonstration (I recommend muting):
 http://youtu.be/ze_MWHqlPeI
-<<<<<<< HEAD
-=======
 
 UPDATE: We have a heroku site you can try this out on: http://sleepy-falls-6535.herokuapp.com/
->>>>>>> WIP
-
-----------
 
 
 How To Run
