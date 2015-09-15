@@ -8,12 +8,6 @@ http://youtu.be/ze_MWHqlPeI
 
 UPDATE: We have a heroku site you can try this out on: http://sleepy-falls-6535.herokuapp.com/
 
-<<<<<<< HEAD
-=======
-----------
-
->>>>>>> 9f27d6d66f2e8cebca91b8d61369b83458cac301
-
 How To Run
 -------------
 
