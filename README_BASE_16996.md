@@ -1,15 +1,7 @@
 LOL-ItemSets
 ===================
 
-This program acts as a webapp, which will display the past 5 weeks of games from a few Pro League of Legends regions. Users can then select a particular game they're interested in, and select a player to download that particular item build.
-
-If you're just interested in seeing what it looks like, check out this youtube video to get a demonstration (I recommend muting):
-http://youtu.be/ze_MWHqlPeI
-<<<<<<< HEAD
-=======
-
-UPDATE: We have a heroku site you can try this out on: http://sleepy-falls-6535.herokuapp.com/
->>>>>>> WIP
+This program acts as a webapp, which will display two weeks of games from NA, EU, KR, and the IWC. Users can then select a particular game they're interested in, and select a player to download that particular item build.
 
 ----------
 
@@ -43,7 +35,9 @@ Once you've done this, you can now initialize the database.
 1. If you're just adding more matches, all you need to do is run python in command prompt. Once you do so, write the following commands:
     
 		from lolitemsets import add_matches
-	    add_match()
+	    add_matches("YYYY-MM-DD")
+
+	Where YYYY-MM-DD is some date. This will get a week of games starting from that date. 
 
     >Note: This is super bad and mean to Riot's database, don't do this.
 
@@ -52,5 +46,3 @@ Once you've done this, you can now initialize the database.
 		from lolitemsets import init_db
 		init_db()
 Once you initialize the database, you will have champions and items in it, but no matches. You'll have to call add_matches as described above.
-
-Remember guys, Pro-Item-Sets isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.

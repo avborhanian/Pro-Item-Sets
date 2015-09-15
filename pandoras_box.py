@@ -1,7 +1,6 @@
 import json
 from riot_api import get_acs_info
 import riot_api
-import xml.etree.ElementTree
 import time
 import datetime
 from contextlib import closing
@@ -23,89 +22,125 @@ def do_magic(connect_db, date):
         programming = get_acs_info(esports_api + "/programmingWeek/" + date + "/1.json")
         p_blocks = json.loads(programming.read())["programming_block"]
         for p in p_blocks:
+            print "Trying out " + str(p)
             # For each series in that week, we basically grab that series' xml page and
             # Start getting the match data
-            block = get_acs_info(esports_api + "programming/" + p + ".xml?expand_matches=1").read()
-            block_tree = xml.etree.ElementTree.fromstring(block)
-            print block
-            league_id = block_tree.find('leagueId').text
-            if league_id.isdigit() is False:
-                continue
-            l_id = int(league_id)
-            
-            # You have to do these checks because
-            # Riot includes unrelated stuff like PTL
-            if block_tree.find('matches') is not None:
-                block_tree = block_tree.find('matches')
-                if block_tree.find('item') is not None:
-                    # At this point, we basically get the team names
-                    # Because the Blue and Red Side are incorrect on
-                    # The other pages, so what's the point of getting
-                    # Repetitive info.
-                    block_tree = block_tree.find('item')
-                    teams = []
-                    contestants = block_tree.find('contestants')
-                    for contestant in contestants:
-                        teams.append(contestant.find('name').text)
-                    # Sometimes, this relevant data is still missing
-                    # Skip ittttt if so.
-                    if block_tree.find('gamesInfo') is not None:
-                        games = block_tree.find('gamesInfo')
-                        for game in games:
-                            game_info = get_acs_info(esports_api + "/game/" + game.find('id').text + ".xml")
-                            game_tree = xml.etree.ElementTree.fromstring(game_info.read())
-                            acs_url = game_tree.find('legsUrl')
-                            game_number = game_tree.find('gameNumber').text
-                            # Cant do anything without this.
-                            # Means we don't get LPL games. RIP
-                            if acs_url.text is not None:
-                                add_match(db, acs_url.text, teams, game_number, l_id)
-                            else:
-                                continue
-                    else:
-                        continue
-                else:
+            block = get_acs_info(esports_api + "programming/" + p + ".json?expand_matches=1")
+            block_tree = json.loads(block.read())
+            if "leagueId" in block_tree:
+                league_id =  block_tree["leagueId"]
+                if league_id.isdigit is False or len(league_id) == 0:
+                    print 'League ID isn\'t a digit'
                     continue
             else:
                 continue
+            region_id = 0
+            try:
+                region_id = int(block_tree["leagueId"])
+            except:
+                print 'Failed to get a real id from leagueId'
+                print 'League ID was equal to ' + block_tree['leagueId'] + '.'
+                continue
+            print 'Got a real id! Region id is ' + str(region_id)
+            league_week = block_tree['week']
+            # You have to do these checks because
+            # Riot includes unrelated stuff like PTL
+            if 'matches' in block_tree:
+                block_tree = block_tree['matches'][0]
+                # At this point, we basically get the team names
+                # Because the Blue and Red Side are incorrect on
+                # The other pages, so what's the point of getting
+                # Repetitive info.
+                teams = []
+                contestants = block_tree['contestants']
+                for contestant in contestants:
+                    teams.append(contestants[contestant])
+                # Sometimes, this relevant data is still missing
+                # Skip ittttt if so.
+                added_match = False
+                if 'gamesInfo' in block_tree:
+                    games = block_tree['gamesInfo']
+                    print 'We are working on some games!'
+                    for game in games:
+                        print game
+                        game_info = get_acs_info(esports_api + "/game/" + games[game]['id'] + ".json")
+                        game_tree = json.loads(game_info.read())
+                        acs_url = game_tree['legsUrl']
+                        game_number = game_tree['gameNumber']
+                        winner_id = int(game_tree['winnerId'])
+                        players = game_tree['players']
+                        # Cant do anything without this.
+                        # Means we don't get LPL games. RIP
+                        if acs_url is not None and type(acs_url) is not bool:
+                            added_match = True
+                            add_match(db, acs_url, teams, game_number, winner_id, players, p)
+                        else:
+                            break
+                    if added_match is True:
+                        add_match_details(db, int(p), teams[0], teams[1], league_week, region_id)
+                        for i in range(0, 2):
+                            add_team(db, teams[i]['id'], teams[i]['name'],  teams[i]['logoURL'])
+                else:
+                    print 'gamesInfo not in block_tree'
+                    continue    
+            else:
+                print 'matches not in block_tree'
+                continue
  
+
+def add_match_details(db, series_id, team_one, team_two, week, region_id):
+    db.execute('INSERT INTO match_details (series_id, region_id, team_one_id,'
+               ' team_two_id, league_week) VALUES (?, ?, ?, ?, ?)', 
+                [series_id, region_id, team_one['id'], team_two['id'], week])
+
+
+def add_player_info(db, player_id, name, photo_url):
+    cur = db.execute('select player_id from playerinfo where player_id = ' + str(player_id))
+    check = cur.fetchone()
+    if check is None:
+        db.execute('insert into playerinfo (player_id, name, photo_url) '
+                    'values (?, ?, ?)', [player_id, name, photo_url])
+
+def add_match_participant(db, match_id, player_id, participant_id,
+                            team_id, kills, deaths, assists, champion,
+                            spell_id_one, spell_id_two, item_set):
+    db.execute('insert into match_participant (match_id, player_id,'
+                'participant_id, team_id, kills, deaths, assists, champion,'
+                'spell_id_one, spell_id_two, item_set)'
+                ' values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [match_id, player_id,
+                participant_id, team_id, kills, deaths, assists, champion,
+                spell_id_one, spell_id_two, item_set])
+    
+def add_team(db, team_id, name, url):
+    cur = db.execute('select team_name from teams where team_id = ' + str(team_id))
+    check = cur.fetchone()
+    if check is None:
+        db.execute('insert into teams (team_id, team_name, logo_url)'
+                    ' values (?, ?, ?)', [int(team_id), name, url])
 '''
     This game just takes that information, and adds it to our database.
     That way, we never have to talk to ACS/Swagger API again
 ''' 
-def add_match(db, url, teams, game_number, region):            
+def add_match(db, url, teams, game_number, winner_id, players, series_id):            
     timeline_url = riot_api.get_timeline_url(url)
     md = json.loads(riot_api.get_acs_info(url).read())
     id = md['gameId']
     date = datetime.datetime.fromtimestamp(md['gameCreation']/1000)
     is_json = json.loads(riot_api.get_acs_info(timeline_url).read())['frames']
-    item_sets = json.dumps(build_parser.get_build_steps(is_json))
+    item_sets = build_parser.get_build_steps(is_json)
     participants = md['participants']
-    for player in participants:
-        info = {}
-        if 'masteries' in player:
-            del player['masteries']
-        if 'runes' in player:
-            del player['runes']
-        if 'timeline' in player:
-            del player['timeline']
-        if 'highestAchievedSeasonTier' in player:
-            del player['highestAchievedSeasonTier']
-        info['win'] = player['stats']['win']
-        info['item0'] = player['stats']['item0']
-        info['item1'] = player['stats']['item1']
-        info['item2'] = player['stats']['item2']
-        info['item3'] = player['stats']['item3']
-        info['item4'] = player['stats']['item4']
-        info['item5'] = player['stats']['item5']
-        info['item6'] = player['stats']['item6']
-        info['kills'] = player['stats']['kills']
-        info['deaths'] = player['stats']['deaths']
-        info['assists'] = player['stats']['assists']
-        del player['stats']
-        player['stats'] = info  
+    p_ids = {str(p['stats']['goldEarned']) + " " + str(p['championId']):p['participantId'] for p in participants}
+    for player in players:
+        p = players[player]
+        index = str(p['totalGold']) + " " + str(p['championId'])
+        add_player_info(db, p['id'], p['name'], p['photoURL'])
+        add_match_participant(db, int(id), p['id'], p_ids[index],
+                                p['teamId'], p['kills'], p['deaths'], p['assists'],
+                                p['championId'], p['spell0'], p['spell1'],
+                                json.dumps(item_sets[p_ids[index]]))
     participantIds = json.dumps(md['participantIdentities'])
     participants = json.dumps(participants)
-    db.execute('insert into matches (id, time_stamp, item_sets, participants, participantIds, game_number, teams, region_id) values (?, ?, ?, ?, ?, ?, ?,?)',
-             [id, date.isoformat(), item_sets, participants, participantIds, int(game_number), json.dumps(teams), region])
+    db.execute('insert into matches (match_id, time_stamp, game_number,'
+               'series_id, winning_team_id) values (?, ?, ?, ?, ?)',
+             [id, date.isoformat(), int(game_number), series_id, winner_id])
     db.commit()
