@@ -93,7 +93,7 @@ def show_recent_matches():
                      champions AS c, match_participant AS mp 
                      INNER JOIN (SELECT DISTINCT match_details.series_id, matches.time_stamp  
                      from matches, match_details where match_details.series_id = matches.series_id 
-                     and matches.game_number = 1 ORDER BY match_details.series_id LIMIT 10) t ON matches.series_id = t.series_id
+                     and matches.game_number = 1 ORDER BY match_details.series_id desc LIMIT 10) t ON matches.series_id = t.series_id
                      WHERE t1.team_id = match_details.team_one_id
                      AND t2.team_id = match_details.team_two_id
                      AND mp.match_id = matches.match_id
@@ -150,7 +150,8 @@ def show_league_matches(league_id):
                      champions AS c, match_participant AS mp 
                      INNER JOIN (SELECT DISTINCT match_details.series_id, matches.time_stamp  
                      from matches, match_details where match_details.series_id = matches.series_id 
-                     and matches.game_number = 1 and match_details.region_id = ? ORDER BY match_details.series_id LIMIT 10) t ON matches.series_id = t.series_id
+                     and matches.game_number = 1 and match_details.region_id = ? ORDER BY matches.time_stamp desc
+                     LIMIT 10) t ON matches.series_id = t.series_id
                      WHERE t1.team_id = match_details.team_one_id
                      AND t2.team_id = match_details.team_two_id
                      AND mp.match_id = matches.match_id
