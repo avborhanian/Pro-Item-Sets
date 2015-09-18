@@ -69,6 +69,10 @@ body {
     text-align: center;
 }
 
+span > ul > li, span > span > input {
+    color: black;
+}
+
 .champions > img {
     width: 9%;
     margin: -2px;
