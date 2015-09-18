@@ -5,6 +5,8 @@ import time
 import datetime
 from contextlib import closing
 import build_parser
+import lolitemsets
+
 
 # Come on riot don't look please
 def do_magic(connect_db, date):
@@ -20,7 +22,10 @@ def do_magic(connect_db, date):
     with closing(connect_db) as db:
         # So what we do is grab a week from the Riot site.
         programming = get_acs_info(esports_api + "/programmingWeek/" + date + "/1.json")
-        p_blocks = json.loads(programming.read())["programming_block"]
+        programming_json = json.loads(programming.read())
+        if "programming_block" not in programming_json:
+            return
+        p_blocks = programming_json["programming_block"]
         for p in p_blocks:
             print "Trying out " + str(p)
             # For each series in that week, we basically grab that series' xml page and
@@ -38,10 +43,11 @@ def do_magic(connect_db, date):
             try:
                 region_id = int(block_tree["leagueId"])
             except:
-                print 'Failed to get a real id from leagueId'
-                print 'League ID was equal to ' + block_tree['leagueId'] + '.'
                 continue
             print 'Got a real id! Region id is ' + str(region_id)
+
+            if 'week' not in block_tree:
+                continue
             league_week = block_tree['week']
             # You have to do these checks because
             # Riot includes unrelated stuff like PTL
@@ -52,6 +58,8 @@ def do_magic(connect_db, date):
                 # The other pages, so what's the point of getting
                 # Repetitive info.
                 teams = []
+                if 'contestants' not in block_tree:
+                    break
                 contestants = block_tree['contestants']
                 for contestant in contestants:
                     teams.append(contestants[contestant])
@@ -75,6 +83,7 @@ def do_magic(connect_db, date):
                             added_match = True
                             add_match(db, acs_url, teams, game_number, winner_id, players, p)
                         else:
+                            print "No ACS URL"
                             break
                     if added_match is True:
                         add_match_details(db, int(p), teams[0], teams[1], league_week, region_id)
@@ -144,3 +153,6 @@ def add_match(db, url, teams, game_number, winner_id, players, series_id):
                'series_id, winning_team_id) values (?, ?, ?, ?, ?)',
              [id, date.isoformat(), int(game_number), series_id, winner_id])
     db.commit()
+
+if __name__ == "__main__":
+    do_magic(lolitemsets.connect_db(), time.strftime("2015-09-07"))
