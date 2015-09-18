@@ -40,19 +40,19 @@ $(document).ready(function(){
     });
 });
 </script>
-    <div class="match">
+    <div class="match_tables">
     {% for i in range(0, 2) %}
-    <div class="col-xs-6">
+    <div class="col-xs-6" style="display: inline";>
         <h1>{{ match[i * 5]['team_name'] }}</h1>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
                         <th class="col-md-1" id="testingstuff">Champion</th>
-                        <th class="col-md-2">Summoner Spells</th>
-                        <th class="col-md-2">Summoner Name</th>
+                        <th class="col-md-2">Spells</th>
+                        <th class="col-md-2">Name</th>
                         <th class="col-md-1">KDA</th>
-                        <th class="col-md-5">Items</th>
+                        <th class="col-5">Items</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,7 +64,7 @@ $(document).ready(function(){
                             </td>
                             <td class="col-md-2">
                                     {% for k in range (1, 3) %}
-                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/spell/{{ p['spell' + k|string ] }}" width="50%" style="max-width: 50px;"></img>
+                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/spell/{{ p['spell' + k|string ] }}"></img>
                                     {% endfor %}
                             </td>
                             <td class="col-md-2">{{ p['name'] }}</td>
@@ -73,10 +73,10 @@ $(document).ready(function(){
                                 {% set item_block = p['item_set']['blocks'][p['item_set']['blocks']|length - 1]['items'] %}
                                 <div class="items_list">
                                 {% for k in item_block %}
-                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/item/{{ k['id'] }}.png" width="33%" style="max-width: 42px;"> 
+                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/item/{{ k['id'] }}.png"></img>
                                 {% endfor %}
                                 {% for i in range(item_block|length, 7) %}
-                                    <div style="width:20%; background-color:blue"></div>
+                                    <img class="no-item" src="{{ url_for('static', filename='tinyimg.gif') }}"></img>
                                 {% endfor %}
                                </div>
                             </td>

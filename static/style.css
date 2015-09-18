@@ -2,12 +2,16 @@ body {
     background-color: #303030 ;
     font-family: 'Oswald', sans-serif;
     color: #FFFFFF ;
-    padding-top: 70px;
+    padding: 70px 0px;
     font-size: 150%;
 }
 .item_set {
     display:inline-block;
     
+}
+
+.title, h3   {
+    font-family: 'Open Sans', sans-serif;
 }
 
 .item_info {
@@ -37,7 +41,6 @@ body {
     background-color: #303030 ;
 }
 .matches {
-    padding: 0px;
 }
 
 .series {
@@ -48,15 +51,130 @@ body {
 
 .match {
     background-color: #F0F0F0 ;
+    padding-bottom: 2px;
+}
+
+.match_tables {
+    height: 100%;
+    width: 90%;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .champions {
-    width: 90%;
+    width: 100%;
     margin-right: auto;
     margin-left: auto;
+    text-align: center;
 }
 
 .champions > img {
-    width: 9.4%;
+    width: 9%;
+    margin: -2px;
     position: relative;
+}
+
+.blueTeam {
+    border-bottom: 1px solid blue;
+}
+
+.redTeam {
+    border-bottom: 1px solid red;
+}
+
+.title > div {
+    display: inline-block;
+    width: 50%;
+    font-size: 2em;
+    font-size: 5vm;
+    font-size: 5vmin;
+}
+
+.teamone {
+    text-align: left;
+}
+
+.teamtwo {
+    text-align: right;
+}
+
+.versus {
+    text-decoration: underline;
+    font-weight: bold;
+    font-size: 1.3em;
+    font-size: 3vm;
+    font-size: 3vmin;
+}
+
+.game_number {
+    font-size: 1em;
+    font-size: 3vm;
+    font-size: 3vmin;
+}
+
+.col-5 {
+    border-bottom-color: rgb(221, 221, 221);
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-collapse: collapse;
+    border-image-outset: 0px;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    border-left-color: rgb(221, 221, 221);
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: rgb(221, 221, 221);
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: rgb(255, 255, 255);
+    border-top-style: none;
+    border-top-width: 0px;
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    display: table-cell;
+    float: none;
+    font-family: Oswald, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    height: 60px;
+    line-height: 21.4286px;
+    position: static;
+    text-align: left;
+    vertical-align: bottom;
+    width: 208px;
+    padding: 0px;
+}
+
+table>tbody>tr> td.items_column {
+    width: 100%;
+    height: 100%;
+}
+
+.items_list {
+    width: 100%;
+    height: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.items_list > img {
+    width: 33%;
+    margin:0px -2px;
+    position: relative;
+    max-width:42px;
+}
+
+.col-md-2 > img {
+    display: inline;
+    width: 100%;
+    max-width: 50px;
+}
+
+
+.no-item {
+    display: inline;
+    border: 1px solid black;
 }

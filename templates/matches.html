@@ -3,27 +3,44 @@
 {% set started = false %}
 {% set title = "" %}
 {% for match in matches %}
-{% if started == false %}
-    <div class="series">
-    {% set started = true %}
-{% endif %}
         {% set new_title = match['team_one'] + " vs " + match['team_two'] %}
         {% if new_title != title %}
-            </div></div><div class = "series">
-            <div class="title"><h2>{{ new_title }}</h2></div>
-            <div class="matches">
-            {% set title = new_title %}
-        {% endif %}
-        <div class="match">
-            <a href="/match/{{ match['match_id'] }}">
-            <h3>Game {{ match['game_number'] }}</h3>
-            <div class="champions">
-                {% for champ in match['champions'] %}
-                    <img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ champ }}">
-                {% endfor %}
+                {# This div is for closing a series #}
+            {% if started != false %}
+                </div>
             </div>
-            </a>
-        </div>
+            {% else %}
+                {% set started = true %}
+            {% endif %}
+            <div class = "series">
+                <div class="title">
+                    {# We have to do this all on one line #}
+                    {# because inline-block (which we're making use of) takes whitespace into account. lol #}
+                    <div class="teamone">{{ match['team_one'] }}</div><div class="teamtwo">{{ match['team_two'] }}</div>
+                </div>
+                <div class="matches">
+                {% set title = new_title %}
+                {% endif %}
+                <div class="match">
+                    <a href="/match/{{ match['match_id'] }}">
+                    <div class="game_number">Game {{ match['game_number'] }}</div>
+                    <div class="champions">
+                        {% set left_side_color = "blueTeam" %}
+                        {% set right_side_color = "redTeam" %}
+                        {% if match['team_two'] == match['blue_name'] %}
+                            {% set left_side_color = "redTeam" %}
+                            {% set right_side_color = "blueTeam" %}
+                        {% endif %}
+                        {% for champ in range(0, 5) %}
+                            <img class="{{ left_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">
+                        {% endfor %}
+                            <span class="versus">VS</span>
+                        {% for champ in range(5, 10) %}
+                            <img class="{{ right_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">
+                        {% endfor %}
+                    </div>
+                    </a>
+                </div>
 {% else %}
 Dang. We haven't made matches for these pages yet. Might be because we didn't cover that week, might be because Riot doesn't have match history pages available. Either way, we messed up. Sorry dude.
 {% endfor %}
