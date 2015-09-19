@@ -40,8 +40,6 @@ body {
 .modal-footer {
     background-color: #303030 ;
 }
-.matches {
-}
 
 .series {
     max-width: 900px;
@@ -90,15 +88,17 @@ span > ul > li, span > span > input {
 .title > div {
     display: inline-block;
     width: 50%;
-    font-size: 2em;
-    font-size: 3vm;
-    font-size: 3vmin;
+    font-size: 2.5rem;
+
 }
 
 .teamone {
     text-align: left;
 }
 
+.teamone::after {
+    font-size: 300px;
+}
 .teamone > img {
     margin-right: 2%;
 }
@@ -113,15 +113,11 @@ span > ul > li, span > span > input {
 .versus {
     text-decoration: underline;
     font-weight: bold;
-    font-size: 1.3em;
-    font-size: 3vm;
-    font-size: 3vmin;
+    font-size: 2rem;
 }
 
 .game_number {
-    font-size: 1em;
-    font-size: 2.5vm;
-    font-size: 2.5vmin;
+    font-size: 2rem;
 }
 
 .col-5 {

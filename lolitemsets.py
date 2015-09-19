@@ -96,12 +96,21 @@ def get_team_matches(team_id):
     m = get_list_of_matches(query)
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
 
+# This shows all the matches for a single league.
+@app.route("/league/<int:league_id>")
+@app.route("/league/<int:league_id>/")
+def show_league_matches(league_id):
+    query = " and match_details.region_id = %s " % str(league_id)
+    m = get_list_of_matches(query)
+    version = riot_api.get_version()
+    return render_template('matches.html', matches = m, version = version, dropdown = get_dropdown_menu())
 
 # Default view. This just displays all the matches FROM the pASt 10 ish series.
 @app.route("/")
 def show_recent_matches():
     m = get_list_of_matches()
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
+
 # Returns a single match page.
 # I chose to just keep the summoner_spells in code because
 # I didn't think it made sense to make a web call for something
@@ -124,43 +133,6 @@ def show_match_page(match_id):
             item_set = json.loads(row[9]), safe_set = row[9]) for row in cur.fetchall()]
     version = riot_api.get_version()
     return render_template('match.html', match = m, version = version, dropdown = get_dropdown_menu())
-    
-# This shows all the matches for a single league.
-@app.route("/league/<int:league_id>")
-@app.route("/league/<int:league_id>/")
-def show_league_matches(league_id):
-    cur = g.db.execute("""SELECT t1.team_name, t2.team_name, matches.match_id,
-                     matches.game_number,
-                     MAX (CASE WHEN mp.participant_id = 1 AND mp.champion = c.id THEN c.img_url else null end) AS champ1,
-                     MAX (CASE WHEN mp.participant_id = 2 AND mp.champion = c.id THEN c.img_url else null end) AS champ2,
-                     MAX (CASE WHEN mp.participant_id = 3 AND mp.champion = c.id THEN c.img_url else null end) AS champ3,
-                     MAX (CASE WHEN mp.participant_id = 4 AND mp.champion = c.id THEN c.img_url else null end) AS champ4,
-                     MAX (CASE WHEN mp.participant_id = 5 AND mp.champion = c.id THEN c.img_url else null end) AS champ5,
-                     MAX (CASE WHEN mp.participant_id = 6 AND mp.champion = c.id THEN c.img_url else null end) AS champ6,
-                     MAX (CASE WHEN mp.participant_id = 7 AND mp.champion = c.id THEN c.img_url else null end) AS champ7,
-                     MAX (CASE WHEN mp.participant_id = 8 AND mp.champion = c.id THEN c.img_url else null end) AS champ8,
-                     MAX (CASE WHEN mp.participant_id = 9 AND mp.champion = c.id THEN c.img_url else null end) AS champ9,
-                     MAX (CASE WHEN mp.participant_id = 10 AND mp.champion = c.id THEN c.img_url else null end) AS champ10,
-                     MAX (CASE WHEN mp.participant_id = 1 AND mp.team_id = t1.team_id THEN t1.team_name else null END) AS blue_name,
-                     t1.logo_url, t2.logo_url 
-                     FROM teams AS t1, teams AS t2, match_details, matches, 
-                     champions AS c, match_participant AS mp 
-                     INNER JOIN (SELECT DISTINCT match_details.series_id, matches.time_stamp  
-                     from matches, match_details where match_details.series_id = matches.series_id 
-                     and matches.game_number = 1 and match_details.region_id = ? ORDER BY matches.time_stamp desc
-                     LIMIT 10) t ON matches.series_id = t.series_id
-                     WHERE t1.team_id = match_details.team_one_id
-                     AND t2.team_id = match_details.team_two_id
-                     AND mp.match_id = matches.match_id
-                     AND match_details.region_id = ?
-                     AND mp.champion = c.id
-                     AND match_details.series_id = matches.series_id
-                     group by matches.match_id
-                     order by matches.time_stamp desc""", [str(league_id), str(league_id)])
-    version = riot_api.get_version()
-    m = [dict(team_one = dict(name = row[0], logo = row[15]), team_two = dict(name = row[1], logo = row[16]), match_id = row[2],
-                 game_number = row[3], champions = [row[i] for i in range(4, 14)], blue_name = (row[1] if row[14] is None else row[14])) for row in cur.fetchall()]
-    return render_template('matches.html', matches = m, version = version, dropdown = get_dropdown_menu())
     
 # Just a prettier page for people that
 # Try to put in bad urls
