@@ -1,7 +1,7 @@
 body {
-    background-color: #303030 ;
+    background-color: #d3d3d3 ;
     font-family: 'Oswald', sans-serif;
-    color: #FFFFFF ;
+    color: #3f3f3f ;
     padding: 70px 0px;
     font-size: 150%;
 }
@@ -48,7 +48,6 @@ body {
 }
 
 .match {
-    background-color: #F0F0F0 ;
     padding-bottom: 2px;
 }
 
@@ -73,8 +72,6 @@ span > ul > li, span > span > input {
 
 .champions > img {
     width: 9%;
-    margin: -2px;
-    position: relative;
 }
 
 .blueTeam {
@@ -111,48 +108,12 @@ span > ul > li, span > span > input {
     margin-left: 2%;
 }
 .versus {
-    text-decoration: underline;
     font-weight: bold;
     font-size: 2rem;
 }
 
 .game_number {
     font-size: 2rem;
-}
-
-.col-5 {
-    border-bottom-color: rgb(221, 221, 221);
-    border-bottom-style: solid;
-    border-bottom-width: 2px;
-    border-collapse: collapse;
-    border-image-outset: 0px;
-    border-image-repeat: stretch;
-    border-image-slice: 100%;
-    border-image-source: none;
-    border-image-width: 1;
-    border-left-color: rgb(221, 221, 221);
-    border-left-style: solid;
-    border-left-width: 1px;
-    border-right-color: rgb(221, 221, 221);
-    border-right-style: solid;
-    border-right-width: 1px;
-    border-top-color: rgb(255, 255, 255);
-    border-top-style: none;
-    border-top-width: 0px;
-    box-sizing: border-box;
-    color: rgb(255, 255, 255);
-    display: table-cell;
-    float: none;
-    font-family: Oswald, sans-serif;
-    font-size: 15px;
-    font-weight: bold;
-    height: 60px;
-    line-height: 21.4286px;
-    position: static;
-    text-align: left;
-    vertical-align: bottom;
-    width: 208px;
-    padding: 0px;
 }
 
 table>tbody>tr> td.items_column {

@@ -33,13 +33,7 @@
                             {% set left_side_color = "redTeam" %}
                             {% set right_side_color = "blueTeam" %}
                         {% endif %}
-                        {% for champ in range(0 + modifier, 5 + modifier) %}
-                            <img class="{{ left_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">
-                        {% endfor %}
-                            <span class="versus">VS</span>
-                        {% for champ in range(5 - modifier, 10 - modifier) %}
-                            <img class="{{ right_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">
-                        {% endfor %}
+                        {% for champ in range(0 + modifier, 5 + modifier) %}<img class="{{ left_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">{% endfor %}<span class="versus">VS</span>{% for champ in range(5 - modifier, 10 - modifier) %}<img class="{{ right_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">{% endfor %}
                     </div>
                     </a>
                 </div>
