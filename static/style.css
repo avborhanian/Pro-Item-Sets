@@ -80,19 +80,19 @@ span > ul > li, span > span > input {
 }
 
 .blueTeam {
-    border-bottom: 1px solid blue;
+    border-bottom: 2px solid blue;
 }
 
 .redTeam {
-    border-bottom: 1px solid red;
+    border-bottom: 2px solid red;
 }
 
 .title > div {
     display: inline-block;
     width: 50%;
     font-size: 2em;
-    font-size: 5vm;
-    font-size: 5vmin;
+    font-size: 3vm;
+    font-size: 3vmin;
 }
 
 .teamone {
@@ -113,8 +113,8 @@ span > ul > li, span > span > input {
 
 .game_number {
     font-size: 1em;
-    font-size: 3vm;
-    font-size: 3vmin;
+    font-size: 2.5vm;
+    font-size: 2.5vmin;
 }
 
 .col-5 {
@@ -162,6 +162,11 @@ table>tbody>tr> td.items_column {
     height: 100%;
     margin-top: auto;
     margin-bottom: auto;
+}
+
+.title > div > img {
+    width: 20%;
+    padding: 20px;
 }
 
 .items_list > img {

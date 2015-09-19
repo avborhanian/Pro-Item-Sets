@@ -86,30 +86,21 @@ def teardown_request(exception):
 @app.route("/player/<int:player_id>")
 def get_player_matches(player_id):
     query = " AND match_participant.match_id = matches.match_id AND match_participant.player_id = %s" % str(player_id)
-    m = [dict(team_one = row[0], team_two = row[1], match_id = row[2],
-                 game_number = row[3], time_stamp = row[4],
-                 champions = [row[i] for i in range(5, 15)], blue_name = (row[1] if row[15] is None else row[15])
-                 ) for row in get_list_of_matches(query)]
+    m = get_list_of_matches(query)
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
 
 @app.route("/team/<int:team_id>/")
 @app.route("/team/<int:team_id>")
 def get_team_matches(team_id):
     query = " AND (match_details.team_one_id = %s OR match_details.team_two_id = %s) " % (str(team_id), str(team_id));
-    m = [dict(team_one = row[0], team_two = row[1], match_id = row[2],
-                 game_number = row[3], time_stamp = row[4],
-                 champions = [row[i] for i in range(5, 15)], blue_name = (row[1] if row[15] is None else row[15])
-                 ) for row in get_list_of_matches(query)]
+    m = get_list_of_matches(query)
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
 
 
 # Default view. This just displays all the matches FROM the pASt 10 ish series.
 @app.route("/")
 def show_recent_matches():
-    m = [dict(team_one = row[0], team_two = row[1], match_id = row[2],
-                 game_number = row[3], time_stamp = row[4],
-                 champions = [row[i] for i in range(5, 15)], blue_name = (row[1] if row[15] is None else row[15])
-                 ) for row in get_list_of_matches()]
+    m = get_list_of_matches()
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
 # Returns a single match page.
 # I chose to just keep the summoner_spells in code because
@@ -150,7 +141,8 @@ def show_league_matches(league_id):
                      MAX (CASE WHEN mp.participant_id = 8 AND mp.champion = c.id THEN c.img_url else null end) AS champ8,
                      MAX (CASE WHEN mp.participant_id = 9 AND mp.champion = c.id THEN c.img_url else null end) AS champ9,
                      MAX (CASE WHEN mp.participant_id = 10 AND mp.champion = c.id THEN c.img_url else null end) AS champ10,
-                     MAX (CASE WHEN mp.participant_id = 1 AND mp.team_id = t1.team_id THEN t1.team_name else null END) AS blue_name
+                     MAX (CASE WHEN mp.participant_id = 1 AND mp.team_id = t1.team_id THEN t1.team_name else null END) AS blue_name,
+                     t1.logo_url, t2.logo_url 
                      FROM teams AS t1, teams AS t2, match_details, matches, 
                      champions AS c, match_participant AS mp 
                      INNER JOIN (SELECT DISTINCT match_details.series_id, matches.time_stamp  
@@ -166,9 +158,8 @@ def show_league_matches(league_id):
                      group by matches.match_id
                      order by matches.time_stamp desc""", [str(league_id), str(league_id)])
     version = riot_api.get_version()
-    m = [dict(team_one = row[0], team_two = row[1], match_id = row[2],
-                 game_number = row[3], champions = [row[i] for i in range(4, 14)], blue_name = (row[1] if row[14] is None else row[14])
-                 ) for row in cur.fetchall()]
+    m = [dict(team_one = dict(name = row[0], logo = row[15]), team_two = dict(name = row[1], logo = row[16]), match_id = row[2],
+                 game_number = row[3], champions = [row[i] for i in range(4, 14)], blue_name = (row[1] if row[14] is None else row[14])) for row in cur.fetchall()]
     return render_template('matches.html', matches = m, version = version, dropdown = get_dropdown_menu())
     
 # Just a prettier page for people that
@@ -198,7 +189,8 @@ def get_list_of_matches(unique_qualifier="  "):
                      MAX (CASE WHEN mp.participant_id = 8 AND mp.champion = c.id THEN c.img_url else null end) AS champ8,
                      MAX (CASE WHEN mp.participant_id = 9 AND mp.champion = c.id THEN c.img_url else null end) AS champ9,
                      MAX (CASE WHEN mp.participant_id = 10 AND mp.champion = c.id THEN c.img_url else null end) AS champ10,
-                     MAX (CASE WHEN mp.participant_id = 1 AND mp.team_id = t1.team_id THEN t1.team_name else null END) AS blue_name
+                     MAX (CASE WHEN mp.participant_id = 1 AND mp.team_id = t1.team_id THEN t1.team_name else null END) AS blue_name,
+                      t1.logo_url, t2.logo_url 
                      FROM teams AS t1, teams AS t2, match_details, matches, 
                      champions AS c, match_participant AS mp 
                      INNER JOIN (SELECT DISTINCT match_details.series_id, matches.time_stamp  
@@ -211,9 +203,14 @@ def get_list_of_matches(unique_qualifier="  "):
                      AND match_details.series_id = matches.series_id
                      group by matches.match_id
                      order by t.time_stamp desc""" % unique_qualifier)
-    print string
     cur = g.db.execute(string)
-    return cur.fetchall()
+    m = [dict(team_one = dict(name = row[0], logo = row[16]), 
+        team_two = dict(name = row[1], logo = row[17]), match_id = row[2],
+        game_number = row[3], time_stamp = row[4], 
+        champions = [row[i] for i in range(5, 15)], 
+        blue_name = (row[1] if row[15] is None else row[15])) 
+        for row in cur.fetchall()] 
+    return m
 
 if __name__ == "__main__":
     LAST_UPDATED = datetime.datetime.utcfromtimestamp(0)

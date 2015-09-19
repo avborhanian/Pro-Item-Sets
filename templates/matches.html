@@ -3,7 +3,7 @@
 {% set started = false %}
 {% set title = "" %}
 {% for match in matches %}
-        {% set new_title = match['team_one'] + " vs " + match['team_two'] %}
+        {% set new_title = match['team_one']['name'] + " vs " + match['team_two']['name'] %}
         {% if new_title != title %}
                 {# This div is for closing a series #}
             {% if started != false %}
@@ -16,7 +16,7 @@
                 <div class="title">
                     {# We have to do this all on one line #}
                     {# because inline-block (which we're making use of) takes whitespace into account. lol #}
-                    <div class="teamone">{{ match['team_one'] }}</div><div class="teamtwo">{{ match['team_two'] }}</div>
+                    <div class="teamone"><img src={{ match['team_one']['logo'] }}></img>{{ match['team_one']['name'] }}</div><div class="teamtwo">{{ match['team_two']['name'] }}<img src={{ match['team_two']['logo'] }}></div>
                 </div>
                 <div class="matches">
                 {% set title = new_title %}
@@ -26,16 +26,18 @@
                     <div class="game_number">Game {{ match['game_number'] }}</div>
                     <div class="champions">
                         {% set left_side_color = "blueTeam" %}
+                        {% set modifier = 0 %}
                         {% set right_side_color = "redTeam" %}
                         {% if match['team_two'] == match['blue_name'] %}
+                            {% set modifier = 5 %}
                             {% set left_side_color = "redTeam" %}
                             {% set right_side_color = "blueTeam" %}
                         {% endif %}
-                        {% for champ in range(0, 5) %}
+                        {% for champ in range(0 + modifier, 5 + modifier) %}
                             <img class="{{ left_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">
                         {% endfor %}
                             <span class="versus">VS</span>
-                        {% for champ in range(5, 10) %}
+                        {% for champ in range(5 - modifier, 10 - modifier) %}
                             <img class="{{ right_side_color }}" src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/champion/{{ match['champions'][champ] }}">
                         {% endfor %}
                     </div>
