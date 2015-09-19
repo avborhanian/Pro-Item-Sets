@@ -99,10 +99,17 @@ span > ul > li, span > span > input {
     text-align: left;
 }
 
+.teamone > img {
+    margin-right: 2%;
+}
+
 .teamtwo {
     text-align: right;
 }
 
+.teamtwo> img {
+    margin-left: 2%;
+}
 .versus {
     text-decoration: underline;
     font-weight: bold;
@@ -166,7 +173,8 @@ table>tbody>tr> td.items_column {
 
 .title > div > img {
     width: 20%;
-    padding: 20px;
+    margin-top: 3%;
+    margin-bottom: 3%;
 }
 
 .items_list > img {
