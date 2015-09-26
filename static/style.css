@@ -152,3 +152,15 @@ table>tbody>tr> td.items_column {
     display: inline;
     border: 1px solid black;
 }
+
+#filelocation {
+    display: none;
+}
+
+#orderModal {
+    max-height: 714px;
+}
+
+.modal-content {
+    color: #d3d3d3;
+}

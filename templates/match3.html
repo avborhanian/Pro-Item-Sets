@@ -14,7 +14,6 @@ function item_img(item_code) {
 $(document).ready(function(){ 
     var phantomSelect = function() {
         // NOTE: we could manipulate the value before selecting here as well
-        // JUST A CHECK
         $('#filelocation').select();
     };
     $(document).on('copy', function(ev) {
@@ -50,7 +49,7 @@ $(document).ready(function(){
         }
         $("#orderDetails").html(string);
         $('#orderModal').css('margin-top', function () { //vertical centering
-                return ($(window).height() - $('#orderModal').height()) / 2;
+                return -($('#orderModal').height() / 2);
             },
             'margin-left', function () { //Horizontal centering
                 return -($('#orderModal').width() / 2);
