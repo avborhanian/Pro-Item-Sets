@@ -9,18 +9,28 @@ config = ConfigParser.RawConfigParser()
 config.read('configuration')
 
 SECRET_KEY = config.get("Riot API", "SECRET_KEY")
-    
+LAST_UPDATE = datetime.datetime.utcfromtimestamp(0)
+THIRTY_MINUTES = 1800
+VERSION = ""
+
 def get_version():
-    try:
-        response = urllib2.urlopen("https://ddragon.leagueoflegends.com/realms/na.json")
-        return json.loads(response.read())
-    except urllib2.HTTPError, e:
-        print "ERROR! " + str(e.code)
-    except urllib2.URLError, e:
-        print "Error! " + str(e.reason())
-    except httplib.HTTPException, e:
-        print "HTTPException error occurred"
-    return None
+    global VERSION
+    global LAST_UPDATE
+    if (datetime.datetime.now() - LAST_UPDATE).total_seconds() < THIRTY_MINUTES:
+        return VERSION
+    else:
+        LAST_UPDATE = datetime.datetime.now()
+        try:
+            response = urllib2.urlopen("https://ddragon.leagueoflegends.com/realms/na.json")
+            VERSION = json.loads(response.read())
+            return VERSION
+        except urllib2.HTTPError, e:
+            print "ERROR! " + str(e.code)
+        except urllib2.URLError, e:
+            print "Error! " + str(e.reason())
+        except httplib.HTTPException, e:
+            print "HTTPException error occurred"
+        return None
 
 def get_event_frames(match_json):
     if match_json is not None:
