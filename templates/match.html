@@ -1,146 +1,57 @@
+
 {% extends "layout.html" %}
-    
-{% block body %}
-<script>
-    var item_sets = { {% for m in match %}{{m['participant_id']}}:{{ m['safe_set'] | safe }},{% endfor %} };
-    var participantIds = [ {% for m in match %}"{{ m['name'] }}",{% endfor %} ];
-    var champions = [ {% for m in match %}"{{ m['img_url'] }}",{% endfor %} ];
-</script>
-<script type="text/javascript">
-var item_url = "{{ version.cdn }}/{{ version.dd }}/img/item/"
-function item_img(item_code) {
-    return "<img src=" + item_url + item_code + ".png height=\"42\" width=\"42\"/>";
-}
-$(document).ready(function(){ 
-    var phantomSelect = function() {
-        // NOTE: we could manipulate the value before selecting here as well
-        // JUST A CHECK
-        $('#filelocation').select();
-    };
-    $(document).on('copy', function(ev) {
-        if(window.clipboardData) {
-            window.clipboardData.setData('Text', $('#filelocation').html());        
-        } else if(ev.originalEvent.clipboardData) {
-            ev.originalEvent.clipboardData.setData('text/plain', $('#filelocation').html());      
-        } else {
-            alert('Clipboard Data are not supported in this browser. Sorry.');
-        }
-        
-        ev.preventDefault();
-    });
-    $('tr').on('click', function() {
-        var data_id = $(this).attr("data-id");
-        var string = ""
-        for (set in item_sets[data_id]['blocks']) {
-            string += "<h3>" + item_sets[data_id]['blocks'][set]['type'] + "</h3>"
-            string += "<div class=\"item_set\">";
-            for (item in item_sets[data_id]['blocks'][set]['items']) {
-                i = item_sets[data_id]['blocks'][set]['items'][item]
-                if(i['count'] < 2) {
-                    string += item_img(i["id"]);
-                }
-                else {
-                    string += "<div class=\"item_info\">";
-                    string += item_img(i["id"]);
-                    string += "<span class=\"count\">" + i['count'] + "</span>"; 
-                    string += "</div>";
-                }
-            }
-            string += "</div><p>";
-        }
-        $("#orderDetails").html(string);
-        $('#orderModal').css('margin-top', function () { //vertical centering
-                return ($(window).height() - $('#orderModal').height()) / 2;
-            },
-            'margin-left', function () { //Horizontal centering
-                return -($('#orderModal').width() / 2);
-            }
-        );
-        file_title = (champions[data_id - 1].substr(0, champions[data_id - 1].length - 4) + "_" + participantIds[data_id - 1]).split(' ').join('_');
-        item_sets[data_id]['title'] = participantIds[data_id - 1] + "'s " + champions[data_id - 1].substr(0, champions[data_id - 1].length - 4)
-        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(item_sets[data_id]));
-        $("#downloadButton").html('<a href="data:' + data + '" download=' + file_title + '.json style="color: white">Download Item Set</a>');
-        $("#filelocation").html("\\Riot Games\\League of Legends\\Config\\Champions\\" + champions[data_id - 1].substr(0, champions[data_id - 1].length - 4) + "\\Recommended");
-        $('#downloadButton').on('click', function(ev) {
-            try {
-                phantomSelect();
-                if(!document.execCommand('copy')) {
-                    throw "Not supported";
-                }
-            } catch(ex) {
-                alert('This is not supported in current browser');
-            }
-        });
-    });
-});
-</script>
-    <div class="match_tables">
-    {% for i in range(0, 2) %}
-    <div class="col-xs-6" style="display: inline";>
-        <h1>{{ match[i * 5]['team_name'] }}</h1>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th class="col-md-1">Champion</th>
-                        <th class="col-md-2">Spells</th>
-                        <th class="col-md-2">Name</th>
-                        <th class="col-md-1">KDA</th>
-                        <th class="col-md-5">Items</th>
-                        <th class="col-md-2"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                        {% for j in range(5 * i, 5 * i + 5) %}
-                        {% set p = match[j] %}
-                        <tr data-toggle="modal" data-id="{{ j + 1}}" data-target="#orderModal">
-                            <td class="col-md-1">
-                                <img src="{{ version.cdn }}/{{ version.dd }}/img/champion/{{ p['img_url'] }}" width="100%">
-                            </td>
-                            <td class="col-md-2">
-                                    {% for k in range (1, 3) %}
-                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/spell/{{ p['spell' + k|string ] }}"></img>
-                                    {% endfor %}
-                            </td>
-                            <td class="col-md-2">{{ p['name'] }}</td>
-                            <td class="col-md-1">{{ p['kills'] }}/{{ p['deaths'] }}/{{ p['assists'] }}</td>
-                            <td class="items_column">
-                                {% set item_block = p['item_set']['blocks'][p['item_set']['blocks']|length - 1]['items'] %}
-                                <div class="items_list">
-                                {% for k in item_block %}
-                                    <img src="{{ version.cdn }}/{{ version.dd }}/img/item/{{ k['id'] }}.png"></img>
-                                {% endfor %}
-                                {% for i in range(item_block|length, 7) %}
-                                    <img class="no-item" src="{{ url_for('static', filename='tinyimg.gif') }}"></img>
-                                {% endfor %}
-                               </div>
-                            </td>
-                        </tr>
-                        {% endfor %}                    
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-   <!-- The modal Popup -->
-<div id="orderModal" class="modal fade" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
-    <div class="modal-content">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-         <h3>Build Order</h3>
-
-    </div>
-    <div id="orderDetails" class="modal-body"></div>
-    <div id="orderItems" class="modal-body"></div>
-    <div class="modal-footer">
-        <span id="filelocation"></span>
-        <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-        <button class="btn btn-primary" id="downloadButton"></button> 
-    </div>
-    </div>
-</div>
-
-
-</div>
+{% block body %} <script>var item_sets={ {%for m in match%}{{m['participant_id']}}:{{m['safe_set']|safe}},{%endfor%}};var participantIds=[{%for m in match%}"{{ m['name'] }}",{%endfor%}];var champions=[{%for m in match%}"{{ m['img_url'] }}",{%endfor%}];var item_url="{{ version.cdn }}/{{ version.dd }}/img/item/";
+function item_img(item_code){return"<img src="+item_url+item_code+".png height=\"42\" width=\"42\"/>";}</script> <script src="{{ url_for('static', filename='matchdetails.js') }}"></script> <div
+class="match_tables">
+{% for i in range(0, 2) %}<div
+class="col-xs-6" style="display: inline";><h1>{{ match[i * 5]['team_name'] }}</h1><div
+class="table-responsive"><table
+class="table table-bordered table-hover"><thead><tr><th
+class="col-md-1">Champion</th><th
+class="col-md-2">Spells</th><th
+class="col-md-2">Name</th><th
+class="col-md-1">KDA</th><th
+class="col-md-5">Items</th><th
+class="col-md-2"></th></tr></thead><tbody>
+{% for j in range(5 * i, 5 * i + 5) %}
+{% set p = match[j] %}<tr
+data-toggle="modal" data-id="{{ j + 1}}" data-target="#orderModal"><td
+class="col-md-1">
+<img
+src="{{ version.cdn }}/{{ version.dd }}/img/champion/{{ p['img_url'] }}" width="100%"></td><td
+class="col-md-2">
+{% for k in range (1, 3) %}
+<img
+src="{{ version.cdn }}/{{ version.dd }}/img/spell/{{ p['spell' + k|string ] }}"></img>
+{% endfor %}</td><td
+class="col-md-2">{{ p['name'] }}</td><td
+class="col-md-1">{{ p['kills'] }}/{{ p['deaths'] }}/{{ p['assists'] }}</td><td
+class="items_column">
+{% set item_block = p['item_set']['blocks'][p['item_set']['blocks']|length - 1]['items'] %}<div
+class="items_list">
+{% for k in item_block %}
+<img
+src="{{ version.cdn }}/{{ version.dd }}/img/item/{{ k['id'] }}.png"></img>
+{% endfor %}
+{% for i in range(item_block|length, 7) %}
+<img
+class="no-item" src="{{ url_for('static', filename='tinyimg.gif') }}"></img>
+{% endfor %}</div></td></tr>
+{% endfor %}</tbody></table></div></div>
+{% endfor %}</div><div
+id="orderModal" class="modal fade" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true"><div
+class="modal-content"><div
+class="modal-header">
+<button
+type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button><h3>Build Order</h3></div><div
+id="orderDetails" class="modal-body"></div><div
+id="orderItems" class="modal-body"></div><div
+class="modal-footer">
+<span
+id="filelocation"></span>
+<button
+class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+<button
+class="btn btn-primary" id="downloadButton"></button></div></div></div></div>
 {% endblock %}
+<!--Minify by http://www.MinifyWeb.com/-->

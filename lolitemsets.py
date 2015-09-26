@@ -15,6 +15,7 @@ PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 DATABASE = os.path.join(PROJECT_ROOT, 'tmp', 'lcsifyer.db')
 DEBUG = True
 LAST_UPDATED = datetime.datetime.utcfromtimestamp(0)
+DROPDOWN = None
 
 # The following creates the application AND appies the config info above
 app = Flask(__name__)
@@ -64,13 +65,16 @@ def add_match():
     pandoras_box.do_magic(connect_db(), "2015-08-3")
     
 def get_dropdown_menu():
-    cur = g.db.execute(""" SELECT id, name from leagues""")
-    leagues = [dict(id = row[0], name=row[1]) for row in cur.fetchall()]
-    cur = g.db.execute(""" SELECT player_id, name from playerinfo""")
-    players = [dict(id = row[0], name=row[1]) for row in cur.fetchall()]
-    cur = g.db.execute(""" SELECT team_id, team_name from teams""")
-    teams = [dict(id = row[0], name=row[1]) for row in cur.fetchall()]
-    return dict(League = leagues, Player = players, Team = teams)
+    global DROPDOWN
+    if DROPDOWN is None:
+        cur = g.db.execute(""" SELECT id, name from leagues""")
+        leagues = [dict(id = row[0], name=row[1]) for row in cur.fetchall()]
+        cur = g.db.execute(""" SELECT player_id, name from playerinfo""")
+        players = [dict(id = row[0], name=row[1]) for row in cur.fetchall()]
+        cur = g.db.execute(""" SELECT team_id, team_name from teams""")
+        teams = [dict(id = row[0], name=row[1]) for row in cur.fetchall()]
+        DROPDOWN = dict(League = leagues, Player = players, Team = teams)
+    return DROPDOWN
 
 @app.before_request
 def before_request():

@@ -1,0 +1,9 @@
+$(document).ready(function(){var phantomSelect=function(){$('#filelocation').select();};$(document).on('copy',function(ev){if(window.clipboardData){window.clipboardData.setData('Text',$('#filelocation').html());}else if(ev.originalEvent.clipboardData){ev.originalEvent.clipboardData.setData('text/plain',$('#filelocation').html());}else{alert('Clipboard Data are not supported in this browser. Sorry.');}
+ev.preventDefault();});$('tr').on('click',function(){var data_id=$(this).attr("data-id");var string=""
+for(set in item_sets[data_id]['blocks']){string+="<h3>"+item_sets[data_id]['blocks'][set]['type']+"</h3>"
+string+="<div class=\"item_set\">";for(item in item_sets[data_id]['blocks'][set]['items']){i=item_sets[data_id]['blocks'][set]['items'][item]
+if(i['count']<2){string+=item_img(i["id"]);}
+else{string+="<div class=\"item_info\">";string+=item_img(i["id"]);string+="<span class=\"count\">"+i['count']+"</span>";string+="</div>";}}
+string+="</div><p>";}
+$("#orderDetails").html(string);$('#orderModal').css('margin-top',function(){return($(window).height()-$('#orderModal').height())/2;},'margin-left',function(){return-($('#orderModal').width()/2);});file_title=(champions[data_id-1].substr(0,champions[data_id-1].length-4)+"_"+participantIds[data_id-1]).split(' ').join('_');item_sets[data_id]['title']=participantIds[data_id-1]+"'s "+champions[data_id-1].substr(0,champions[data_id-1].length-4)
+var data="text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(item_sets[data_id]));$("#downloadButton").html('<a href="data:'+data+'" download='+file_title+'.json style="color: white">Download Item Set</a>');$("#filelocation").html("\\Riot Games\\League of Legends\\Config\\Champions\\"+champions[data_id-1].substr(0,champions[data_id-1].length-4)+"\\Recommended");$('#downloadButton').on('click',function(ev){try{phantomSelect();if(!document.execCommand('copy')){throw"Not supported";}}catch(ex){alert('This is not supported in current browser');}});});});
