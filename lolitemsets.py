@@ -90,7 +90,7 @@ def teardown_request(exception):
 @app.route("/player/<int:player_id>")
 def get_player_matches(player_id):
     query = " AND match_participant.match_id = matches.match_id AND match_participant.player_id = %s" % str(player_id)
-    m = get_list_of_matches(query)
+    m = get_list_of_matches(", match_participant", query)
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
 
 @app.route("/team/<int:team_id>/")
@@ -152,7 +152,7 @@ def show_champions():
     entries = [dict(name=row[0], lore=row[1]) for row in cur.fetchall()]
     return render_template('champions.html', entries=entries, dropdown = get_dropdown_menu())
 
-def get_list_of_matches(unique_qualifier="  "):
+def get_list_of_matches(unique_qualifier="  ", other_tables=" "):
     string = ("""SELECT t1.team_name, t2.team_name, matches.match_id,
                      matches.game_number, matches.time_stamp, 
                      MAX (CASE WHEN mp.participant_id = 1 AND mp.champion = c.id THEN c.img_url else null end) AS champ1,
@@ -169,16 +169,17 @@ def get_list_of_matches(unique_qualifier="  "):
                       t1.logo_url, t2.logo_url 
                      FROM teams AS t1, teams AS t2, match_details, matches, 
                      champions AS c, match_participant AS mp 
-                     INNER JOIN (SELECT DISTINCT match_details.series_id, matches.time_stamp  
-                     from matches, match_details, match_participant where match_details.series_id = matches.series_id 
-                     and matches.game_number = 1 %s ORDER BY matches.time_stamp desc LIMIT 10) t ON matches.series_id = t.series_id
+                     INNER JOIN (SELECT match_details.series_id, matches.time_stamp  
+                     from matches, match_details %s where match_details.series_id = matches.series_id 
+                     and matches.game_number = 1
+                     %s ORDER BY matches.time_stamp desc LIMIT 10) t ON matches.series_id = t.series_id
                      WHERE t1.team_id = match_details.team_one_id
                      AND t2.team_id = match_details.team_two_id
                      AND mp.match_id = matches.match_id
                      AND mp.champion = c.id
                      AND match_details.series_id = matches.series_id
                      group by matches.match_id
-                     order by t.time_stamp desc""" % unique_qualifier)
+                     order by t.time_stamp desc""" % (other_tables, unique_qualifier))
     cur = g.db.execute(string)
     m = [dict(team_one = dict(name = row[0], logo = row[16]), 
         team_two = dict(name = row[1], logo = row[17]), match_id = row[2],
