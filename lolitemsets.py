@@ -90,7 +90,7 @@ def teardown_request(exception):
 @app.route("/player/<int:player_id>")
 def get_player_matches(player_id):
     query = " AND match_participant.match_id = matches.match_id AND match_participant.player_id = %s" % str(player_id)
-    m = get_list_of_matches(", match_participant", query)
+    m = get_list_of_matches(query, ", match_participant")
     return render_template('matches.html', matches = m, dropdown = get_dropdown_menu())
 
 @app.route("/team/<int:team_id>/")
