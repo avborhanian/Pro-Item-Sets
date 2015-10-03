@@ -96,6 +96,31 @@ def do_magic(connect_db, date):
                 print 'matches not in block_tree'
                 continue
  
+'''
+def new_api_magic(db):
+    schedule = json.loads(riot_api.get_acs_info('http://api.lolesports.com/api/v1/scheduleItems?leagueId=9'))
+    tournaments = schedule['highlanderTournaments'][0]
+    tournamentId = tournaments['id']
+    barckets = tournaments['brackets']
+    for bracketId, bracket in brackets:
+        for matchId, match in bracket:
+            if match['state'] == 'resolved':
+                games = mtach['games']
+                for highlanderGameId, game in games:
+                    matchDetails = riot_api.get_acs_info('http://api.lolesports.com/api/v2/\
+                        highlanderMatchDetails?tournamentId=?&matchId=?' % tournamentId, matchId)
+                    gameId = game['gameId']
+                    gameRealm = game['gameRealm']
+                    gameDetailsId = game['id']
+                    matchHistory = json.loads(riot_api.get_acs_info('matchhistory..' % gameRealm, gameId, gameHash)).read())
+                    participantIds = matchHistory['participantIdentities']
+                    participants = matchHistory['participants']
+                    parDict = {}
+                    for participant in participantIds:
+                        parDict[participant['player']['summonerName']['name']] = participant['participantId']
+                    for player in game['players']:
+                        add_player_info(db, )
+'''
 
 def add_match_details(db, series_id, team_one, team_two, week, region_id):
     db.execute('INSERT INTO match_details (series_id, region_id, team_one_id,'
@@ -126,6 +151,9 @@ def add_team(db, team_id, name, url):
     if check is None:
         db.execute('insert into teams (team_id, team_name, logo_url)'
                     ' values (?, ?, ?)', [int(team_id), name, url])
+
+
+
 '''
     This game just takes that information, and adds it to our database.
     That way, we never have to talk to ACS/Swagger API again
